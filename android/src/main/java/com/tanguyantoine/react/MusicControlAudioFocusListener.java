@@ -3,10 +3,8 @@ package com.tanguyantoine.react;
 import android.content.Context;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
-import android.media.AudioAttributes;
 import android.os.Build;
 import android.util.Log;
-import android.media.AudioManager.OnAudioFocusChangeListener;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 
@@ -19,8 +17,6 @@ public class MusicControlAudioFocusListener implements AudioManager.OnAudioFocus
     private static final String TAG = "WonderyDebug";
     private AudioManager mAudioManager;
     private AudioFocusRequest mFocusRequest;
-    private AudioAttributes playbackAttributes;
-    private OnAudioFocusChangeListener mOnAudioFocusChangeListener;
 
     private boolean mPlayOnAudioFocus = false;
 
@@ -79,22 +75,15 @@ public class MusicControlAudioFocusListener implements AudioManager.OnAudioFocus
     public void requestAudioFocus() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Log.d(TAG, "request audio focus if");
-        //     playbackAttributes = new AudioAttributes.Builder()
-        // .setUsage(AudioAttributes.USAGE_GAME)
-        // .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-        // .build();
 
             mFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-            // .setAudioAttributes(playbackAttributes)
-            // .setAcceptsDelayedFocusGain(true)
-                    .setOnAudioFocusChangeListener(this)
-                    .build();
+                .setOnAudioFocusChangeListener(this)
+                .build();
 
             mAudioManager.requestAudioFocus(mFocusRequest);
         } else {
-        Log.d(TAG, "this: " + mAudioManager.);
             Log.d(TAG, "requesting audio focus else");
-            mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         }
     }
 
@@ -104,7 +93,7 @@ public class MusicControlAudioFocusListener implements AudioManager.OnAudioFocus
             mAudioManager.abandonAudioFocusRequest(mFocusRequest);
         } else if ( mAudioManager != null ) {
             Log.d(TAG, "abandoning audio focus else");
-            mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
+            mAudioManager.abandonAudioFocus(this);
         }
     }
 }
